@@ -3,13 +3,7 @@ import { useRouter } from 'expo-router';
 import React, { useContext } from 'react';
 import {
     Alert,
-    Image // Thêm Image vào đây
-    ,
-
-
-
-
-
+    Image,
     SafeAreaView,
     ScrollView,
     StatusBar,
