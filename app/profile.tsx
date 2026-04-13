@@ -3,13 +3,7 @@ import { useRouter } from 'expo-router';
 import React, { useContext } from 'react';
 import {
     Alert,
-    Image // Thêm Image vào đây
-    ,
-
-
-
-
-
+    Image,
     SafeAreaView,
     ScrollView,
     StatusBar,
@@ -108,18 +102,6 @@ export default function ProfileScreen() {
           <TouchableOpacity style={[styles.optionItem, { backgroundColor: theme === 'dark' ? '#1f1f29' : '#ffffff' }]} activeOpacity={0.7} onPress={() => navigate('/doi_mat_khau')}>
             <MaterialIcons name="lock" size={24} color="#764ba2" />
             <Text style={[styles.optionText, { color: themeColors.text }]}>Đổi mật khẩu</Text>
-            <MaterialIcons name="chevron-right" size={24} color="#ccc" />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={[styles.optionItem, { backgroundColor: theme === 'dark' ? '#1f1f29' : '#ffffff' }]} activeOpacity={0.7}>
-            <MaterialIcons name="help" size={24} color="#764ba2" />
-            <Text style={[styles.optionText, { color: themeColors.text }]}>{t('profile.help')}</Text>
-            <MaterialIcons name="chevron-right" size={24} color="#ccc" />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={[styles.optionItem, { backgroundColor: theme === 'dark' ? '#1f1f29' : '#ffffff' }]} activeOpacity={0.7}>
-            <MaterialIcons name="info" size={24} color="#764ba2" />
-            <Text style={[styles.optionText, { color: themeColors.text }]}>{t('profile.about')}</Text>
             <MaterialIcons name="chevron-right" size={24} color="#ccc" />
           </TouchableOpacity>
         </View>
