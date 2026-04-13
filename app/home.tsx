@@ -200,46 +200,56 @@ export default function HomeScreen() {
           <View style={styles.gridContainer}>
             <TouchableOpacity
               style={[
-                styles.card,
-                isHeaterOn && styles.cardActive,
-                {
-                  backgroundColor: isHeaterOn
-                    ? "#e8f5e9"
-                    : theme === "dark"
-                      ? "#1f1f29"
-                      : "#ffffff",
-                },
-              ]}
+              styles.card,
+              isHeaterOn && styles.cardActive,
+              {
+                backgroundColor: isHeaterOn
+                  ? (theme === "dark" ? "#2a3f2a" : "#f4fbf4")
+                  : (theme === "dark" ? "#1f1f29" : "#ffffff"),
+              },
+            ]}
               onPress={() => toggleDevice("heater")}
             >
               <Text style={styles.icon}>💡</Text>
               <Text style={[styles.cardLabel, { color: themeColors.text }]}>
                 {UI_TEXT.devices.light}
               </Text>
-              <Text style={[styles.cardStatus, isHeaterOn && styles.statusOn]}>
+              <Text style={[
+                styles.cardStatus, 
+                { 
+                  color: isHeaterOn 
+                    ? "#4CAF50"
+                    : (theme === "dark" ? "#ffffff" : "#ff3b30")
+                }
+              ]}>
                 {isHeaterOn ? UI_TEXT.devices.on : UI_TEXT.devices.off}
               </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={[
-                styles.card,
-                isPumpOn && styles.cardActive,
-                {
-                  backgroundColor: isPumpOn
-                    ? "#e8f5e9"
-                    : theme === "dark"
-                      ? "#1f1f29"
-                      : "#ffffff",
-                },
-              ]}
+              styles.card,
+              isPumpOn && styles.cardActive,
+              {
+                backgroundColor: isPumpOn
+                  ? (theme === "dark" ? "#2a3f2a" : "#f4fbf4")
+                  : (theme === "dark" ? "#1f1f29" : "#ffffff"),
+              },
+            ]}
               onPress={() => toggleDevice("pump")}
             >
               <Text style={styles.icon}>🔔</Text>
               <Text style={[styles.cardLabel, { color: themeColors.text }]}>
                 {UI_TEXT.devices.alarm}
               </Text>
-              <Text style={[styles.cardStatus, isPumpOn && styles.statusOn]}>
+              <Text style={[
+                styles.cardStatus,
+                {
+                  color: isPumpOn
+                    ? "#4CAF50"
+                    : (theme === "dark" ? "#ffffff" : "#ff3b30")
+                }
+              ]}>
                 {isPumpOn ? UI_TEXT.devices.on : UI_TEXT.devices.off}
               </Text>
             </TouchableOpacity>
