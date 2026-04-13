@@ -110,18 +110,6 @@ export default function ProfileScreen() {
             <Text style={[styles.optionText, { color: themeColors.text }]}>Đổi mật khẩu</Text>
             <MaterialIcons name="chevron-right" size={24} color="#ccc" />
           </TouchableOpacity>
-
-          <TouchableOpacity style={[styles.optionItem, { backgroundColor: theme === 'dark' ? '#1f1f29' : '#ffffff' }]} activeOpacity={0.7}>
-            <MaterialIcons name="help" size={24} color="#764ba2" />
-            <Text style={[styles.optionText, { color: themeColors.text }]}>{t('profile.help')}</Text>
-            <MaterialIcons name="chevron-right" size={24} color="#ccc" />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={[styles.optionItem, { backgroundColor: theme === 'dark' ? '#1f1f29' : '#ffffff' }]} activeOpacity={0.7}>
-            <MaterialIcons name="info" size={24} color="#764ba2" />
-            <Text style={[styles.optionText, { color: themeColors.text }]}>{t('profile.about')}</Text>
-            <MaterialIcons name="chevron-right" size={24} color="#ccc" />
-          </TouchableOpacity>
         </View>
 
         <TouchableOpacity style={[styles.logoutButton, { backgroundColor: '#764ba2' }]} activeOpacity={0.7} onPress={handleLogout}>
