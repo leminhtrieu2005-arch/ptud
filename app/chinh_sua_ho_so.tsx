@@ -2,18 +2,18 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
-    Alert,
-    Image,
-    KeyboardAvoidingView,
-    Platform,
-    SafeAreaView,
-    ScrollView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 
 import { useAppSettings } from '@/app/providers/AppSettingsProvider';
@@ -81,13 +81,13 @@ export default function EditProfileScreen() {
       await updateProfile(auth.currentUser, { photoURL: imageUrl });
       
       setPhotoURL(imageUrl);
-      Alert.alert('Thành công', 'Ảnh đại diện đã được thay đổi!');
+      Alert.alert(t('common.success'), t('editProfile.avatarSuccess'));
     } else {
-      Alert.alert('Lỗi', 'Không thể upload ảnh');
+      Alert.alert(t('common.error'), t('editProfile.uploadError'));
     }
   } catch (error) {
     console.error(error);
-    Alert.alert('Lỗi', 'Upload thất bại, thử lại sau');
+    Alert.alert(t('common.error'), t('editProfile.uploadFailed'));
   } finally {
     setUploading(false);
   }
@@ -96,7 +96,7 @@ export default function EditProfileScreen() {
   // Cập nhật tên
   const handleUpdate = async () => {
     if (!displayName.trim()) {
-      Alert.alert(t('common.error'), 'Tên không được để trống');
+      Alert.alert(t('common.error'), t('editProfile.nameRequired'));
       return;
     }
 
@@ -104,12 +104,12 @@ export default function EditProfileScreen() {
     try {
       if (auth.currentUser) {
         await updateProfile(auth.currentUser, { displayName });
-        Alert.alert('Thành công', 'Thông tin đã được cập nhật!', [
+        Alert.alert(t('common.success'), t('editProfile.updateSuccess'), [
           { text: 'OK', onPress: () => router.back() },
         ]);
       }
     } catch (error) {
-      Alert.alert('Lỗi', 'Không thể cập nhật hồ sơ.');
+      Alert.alert(t('common.error'), t('editProfile.updateError'));
     } finally {
       setLoading(false);
     }
@@ -124,7 +124,7 @@ export default function EditProfileScreen() {
         <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
           <MaterialIcons name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Chỉnh sửa hồ sơ</Text>
+        <Text style={styles.headerTitle}>{t('editProfile.title')}</Text>
         <View style={{ width: 40 }} />
       </View>
 
@@ -144,14 +144,14 @@ export default function EditProfileScreen() {
               </View>
               {uploading && (
                 <View style={styles.uploadingOverlay}>
-                  <Text style={styles.uploadingText}>Đang tải...</Text>
+                  <Text style={styles.uploadingText}>{t('editProfile.uploading')}</Text>
                 </View>
               )}
             </TouchableOpacity>
 
             <TouchableOpacity onPress={pickImage} style={styles.changePhotoButton}>
               <MaterialIcons name="photo-camera" size={20} color="#764ba2" />
-              <Text style={styles.changePhotoText}>Thay đổi ảnh đại diện</Text>
+              <Text style={styles.changePhotoText}>{t('editProfile.changePhoto')}</Text>
             </TouchableOpacity>
 
             <Text style={[styles.emailHint, { color: theme === 'dark' ? '#aaa' : '#666' }]}>
@@ -161,20 +161,20 @@ export default function EditProfileScreen() {
 
           {/* Form */}
           <View style={styles.formContainer}>
-            <Text style={[styles.inputLabel, { color: themeColors.text }]}>Họ và tên</Text>
+            <Text style={[styles.inputLabel, { color: themeColors.text }]}>{t('editProfile.fullName')}</Text>
             <View style={[styles.inputWrapper, { backgroundColor: theme === 'dark' ? '#1f1f29' : '#fff' }]}>
               <MaterialIcons name="person-outline" size={20} color="#764ba2" />
               <TextInput
                 style={[styles.input, { color: themeColors.text }]}
                 value={displayName}
                 onChangeText={setDisplayName}
-                placeholder="Nhập tên của bạn"
+                placeholder={t('editProfile.namePlaceholder')}
                 placeholderTextColor="#888"
               />
             </View>
 
             <Text style={[styles.noteText, { color: theme === 'dark' ? '#888' : '#999' }]}>
-              Lưu ý: Tên này sẽ hiển thị trên thanh điều hướng và trang cá nhân.
+              {t('editProfile.note')}
             </Text>
           </View>
 
@@ -185,7 +185,7 @@ export default function EditProfileScreen() {
             disabled={loading}
           >
             <Text style={styles.saveButtonText}>
-              {loading ? 'Đang lưu...' : 'Lưu thay đổi'}
+              {loading ? t('editProfile.saving') : t('editProfile.saveButton')}
             </Text>
           </TouchableOpacity>
         </ScrollView>
