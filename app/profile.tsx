@@ -2,15 +2,15 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useContext } from 'react';
 import {
-    Alert,
-    Image,
-    SafeAreaView,
-    ScrollView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View
+  Alert,
+  Image,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native';
 
 import { useAppSettings } from '@/app/providers/AppSettingsProvider';
@@ -25,7 +25,7 @@ export default function ProfileScreen() {
   const { unread } = useContext(NotiContext);
   const headerColor = theme === 'dark' ? '#3f2e5a' : '#764ba2';
 
-  // Lấy thông tin user hiện tại từ Firebase
+  // Lấy thông tin người dùng hiện tại từ Firebase
   const user = auth.currentUser;
 
   const handleLogout = () => {
@@ -33,7 +33,7 @@ export default function ProfileScreen() {
       t('profile.logout'),
       `${t('profile.logout')}?`,
       [
-        { text: 'Hủy', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
           text: t('profile.logout'),
           style: 'destructive',
@@ -42,7 +42,7 @@ export default function ProfileScreen() {
               await auth.signOut();
               router.replace('/');
             } catch {
-              Alert.alert('Lỗi', 'Không thể đăng xuất. Vui lòng thử lại.');
+              Alert.alert(t('common.error'), t('profile.logoutError'));
             }
           },
         },
@@ -101,7 +101,7 @@ export default function ProfileScreen() {
 
           <TouchableOpacity style={[styles.optionItem, { backgroundColor: theme === 'dark' ? '#1f1f29' : '#ffffff' }]} activeOpacity={0.7} onPress={() => navigate('/doi_mat_khau')}>
             <MaterialIcons name="lock" size={24} color="#764ba2" />
-            <Text style={[styles.optionText, { color: themeColors.text }]}>Đổi mật khẩu</Text>
+            <Text style={[styles.optionText, { color: themeColors.text }]}>{t('profile.changePassword')}</Text>
             <MaterialIcons name="chevron-right" size={24} color="#ccc" />
           </TouchableOpacity>
         </View>
