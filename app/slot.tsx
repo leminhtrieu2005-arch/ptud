@@ -1,4 +1,4 @@
-﻿import { MaterialIcons } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { onValue, ref } from "firebase/database";
 import React, { useEffect, useState } from "react";
@@ -22,24 +22,24 @@ export default function SlotScreen() {
   const themeColors = Colors[theme];
   const TOTAL_SLOTS = 6;
 
-  // Khởi tạo 6 vị trí ban đầu
+  // Khởi tạo 6 vị trí ban đầu - slot 3,4,5,6 có giá trị mặc định là false (trống)
   const [slots, setSlots] = useState([
     { id: 1, isOccupied: false },
     { id: 2, isOccupied: false },
-    { id: 3, isOccupied: false },
-    { id: 4, isOccupied: false },
-    { id: 5, isOccupied: false },
-    { id: 6, isOccupied: false },
+    { id: 3, isOccupied: true }, // Giá trị mặc định - không đọc từ Firebase
+    { id: 4, isOccupied: true }, // Giá trị mặc định - không đọc từ Firebase
+    { id: 5, isOccupied: true }, // Giá trị mặc định - không đọc từ Firebase
+    { id: 6, isOccupied: true }, // Giá trị mặc định - không đọc từ Firebase
   ]);
 
   useEffect(() => {
-    console.log("Setting up Firebase listeners for 6 sensors...");
+    console.log("Setting up Firebase listeners for 2 sensors only...");
 
     // Mảng để lưu các hàm unsubscribe nhằm cleanup sau này
     const unsubscribes: (() => void)[] = [];
 
-    // Sử dụng vòng lặp để tạo listener cho sensorStatus1 -> sensorStatus6
-    for (let i = 1; i <= TOTAL_SLOTS; i++) {
+    // Chỉ đọc sensorStatus1 và sensorStatus2 từ Firebase
+    for (let i = 1; i <= 2; i++) {
       const sensorRef = ref(db, `thuan2/sensor/sensorStatus${i}`);
 
       const unsubscribe = onValue(
@@ -67,7 +67,7 @@ export default function SlotScreen() {
 
     // Cleanup: Chạy tất cả các hàm unsubscribe khi component bị unmount
     return () => {
-      console.log("Cleaning up all Firebase listeners");
+      console.log("Cleaning up Firebase listeners");
       unsubscribes.forEach((unsub) => unsub());
     };
   }, []);
@@ -173,7 +173,7 @@ export default function SlotScreen() {
                   { color: slot.isOccupied ? "#F44336" : "#4CAF50" },
                 ]}
               >
-                VỊ TRÍ {slot.id}
+                {t("slot.slot")} {slot.id}
               </Text>
 
               <View style={styles.statusIcon}>
