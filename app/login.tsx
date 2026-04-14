@@ -81,7 +81,7 @@ export default function LoginScreen() {
         // Đăng nhập thành công, onAuthStateChanged sẽ handle navigation
       }
     } catch (e: any) {
-      Alert.alert("Thất bại", e.message);
+      Alert.alert("Thất bại", "Sai Email hoặc mật khẩu");
     } finally {
       setLoading(false);
     }
