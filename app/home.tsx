@@ -4,7 +4,6 @@ import Slider from "@react-native-community/slider";
 import { useRouter } from "expo-router";
 import React, { useContext, useEffect, useState } from "react";
 import {
-  Alert,
   Platform,
   SafeAreaView,
   ScrollView,
@@ -22,44 +21,11 @@ import { onValue, ref, update } from "firebase/database";
 import { db } from "../firebaseConfig";
 import { NotiContext } from "./_layout";
 
-const UI_TEXT = {
-  sectionActive: "📊 Điều khiển thiết bị",
-  sectionSensors: "📈 Thông số nhiệt độ độ ẩm bãi xe",
-  sectionPassive: "⚙️ Thiết lập hệ thống",
-  devices: {
-    light: "Đèn",
-    alarm: "Báo động",
-    door: "Cửa ra vào",
-    parking: "Bãi đậu xe",
-    on: "BẬT",
-    off: "TẮT",
-  },
-  sensors: {
-    temp: "Nhiệt độ",
-    humi: "Độ ẩm",
-    unitTemp: "°C",
-    unitHumi: "%",
-  },
-  thresholds: {
-    tempTitle: "Ngưỡng Nhiệt",
-    timeOnTitle: "Giờ mở đèn",
-    timeOffTitle: "Giờ tắt đèn",
-    btnUpdate: "LƯU TẤT CẢ THIẾT LẬP",
-  },
-  nav: {
-    overview: "Tổng quan",
-    graph: "Biểu đồ",
-    news: "Tin tức",
-    noti: "Thông báo",
-    profile: "Cá nhân",
-  },
-};
-
 export default function HomeScreen() {
   const router = useRouter();
-  const { theme } = useAppSettings();
+  const { theme, t } = useAppSettings();
   const themeColors = Colors[theme];
-  const { unread } = useContext(NotiContext);
+  const { unread, triggerNotification } = useContext(NotiContext);
 
   // State cảm biến và thiết bị
   const [temperature, setTemperature] = useState(0);
@@ -71,7 +37,7 @@ export default function HomeScreen() {
   const [tempThreshold, setTempThreshold] = useState(35);
   const [lightOnTime, setLightOnTime] = useState("18:30");
   const [lightOffTime, setLightOffTime] = useState("05:30");
-  const [isUnlocked, setIsUnlocked] = useState(false); // Thay đổi từ isLocked
+  const [isUnlocked, setIsUnlocked] = useState(false);
 
   // State điều khiển Picker
   const [pickerConfig, setPickerConfig] = useState({
@@ -115,7 +81,7 @@ export default function HomeScreen() {
         if (data.tempLimit) setTempThreshold(Number(data.tempLimit));
         if (data.lightOnTime) setLightOnTime(data.lightOnTime);
         if (data.lightOffTime) setLightOffTime(data.lightOffTime);
-        setIsUnlocked(data.auto === 1); // Cập nhật trạng thái unlock từ Firebase
+        setIsUnlocked(data.auto === 1);
       }
     });
 
@@ -125,6 +91,10 @@ export default function HomeScreen() {
       unsubscribeSettings();
     };
   }, []);
+
+  // ❌ ĐÃ XOÁ: useEffect cảnh báo nhiệt độ ở đây
+  // Việc cảnh báo nhiệt độ đã được xử lý tập trung tại _layout.tsx
+  // Không được xử lý tại đây để tránh thông báo bị lặp.
 
   const toggleDevice = async (device: string) => {
     const controlPath = ref(db, "thuan/control");
@@ -138,7 +108,6 @@ export default function HomeScreen() {
     }
   };
 
-  // Hàm toggle unlock
   const toggleUnlock = async (value: boolean) => {
     try {
       await update(ref(db, "thuan/settings"), { auto: value ? 1 : 0 });
@@ -168,9 +137,10 @@ export default function HomeScreen() {
         lightOnTime: lightOnTime,
         lightOffTime: lightOffTime,
       });
-      Alert.alert("Thông báo", "Đã lưu cài đặt thành công!");
+      // ✅ Truyền type riêng biệt để không bị chặn nhầm bởi logic dedup
+      triggerNotification("✅ Đã lưu cài đặt thành công!", "SAVE_SUCCESS");
     } catch (error) {
-      Alert.alert("Lỗi", "Không thể lưu dữ liệu.");
+      triggerNotification("❌ Không thể lưu dữ liệu.", "SAVE_ERROR");
     }
   };
 
@@ -195,52 +165,52 @@ export default function HomeScreen() {
           ]}
         >
           <Text style={[styles.sectionTitle, { color: themeColors.text }]}>
-            {UI_TEXT.sectionActive}
+            {t('home.active')}
           </Text>
           <View style={styles.gridContainer}>
             <TouchableOpacity
               style={[
-              styles.card,
-              isHeaterOn && styles.cardActive,
-              {
-                backgroundColor: isHeaterOn
-                  ? (theme === "dark" ? "#2a3f2a" : "#f4fbf4")
-                  : (theme === "dark" ? "#1f1f29" : "#ffffff"),
-              },
-            ]}
+                styles.card,
+                isHeaterOn && styles.cardActive,
+                {
+                  backgroundColor: isHeaterOn
+                    ? (theme === "dark" ? "#2a3f2a" : "#f4fbf4")
+                    : (theme === "dark" ? "#1f1f29" : "#ffffff"),
+                },
+              ]}
               onPress={() => toggleDevice("heater")}
             >
               <Text style={styles.icon}>💡</Text>
               <Text style={[styles.cardLabel, { color: themeColors.text }]}>
-                {UI_TEXT.devices.light}
+                {t('home.light')}
               </Text>
               <Text style={[
-                styles.cardStatus, 
-                { 
-                  color: isHeaterOn 
+                styles.cardStatus,
+                {
+                  color: isHeaterOn
                     ? "#4CAF50"
                     : (theme === "dark" ? "#ffffff" : "#ff3b30")
                 }
               ]}>
-                {isHeaterOn ? UI_TEXT.devices.on : UI_TEXT.devices.off}
+                {isHeaterOn ? t('home.on') : t('home.off')}
               </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={[
-              styles.card,
-              isPumpOn && styles.cardActive,
-              {
-                backgroundColor: isPumpOn
-                  ? (theme === "dark" ? "#2a3f2a" : "#f4fbf4")
-                  : (theme === "dark" ? "#1f1f29" : "#ffffff"),
-              },
-            ]}
+                styles.card,
+                isPumpOn && styles.cardActive,
+                {
+                  backgroundColor: isPumpOn
+                    ? (theme === "dark" ? "#2a3f2a" : "#f4fbf4")
+                    : (theme === "dark" ? "#1f1f29" : "#ffffff"),
+                },
+              ]}
               onPress={() => toggleDevice("pump")}
             >
               <Text style={styles.icon}>🔔</Text>
               <Text style={[styles.cardLabel, { color: themeColors.text }]}>
-                {UI_TEXT.devices.alarm}
+                {t('home.alarm')}
               </Text>
               <Text style={[
                 styles.cardStatus,
@@ -250,7 +220,7 @@ export default function HomeScreen() {
                     : (theme === "dark" ? "#ffffff" : "#ff3b30")
                 }
               ]}>
-                {isPumpOn ? UI_TEXT.devices.on : UI_TEXT.devices.off}
+                {isPumpOn ? t('home.on') : t('home.off')}
               </Text>
             </TouchableOpacity>
 
@@ -263,7 +233,7 @@ export default function HomeScreen() {
             >
               <Text style={styles.icon}>🪟</Text>
               <Text style={[styles.cardLabel, { color: themeColors.text }]}>
-                {UI_TEXT.devices.door}
+                {t('home.door')}
               </Text>
               <Text style={styles.cardStatus}>Truy cập</Text>
             </TouchableOpacity>
@@ -277,14 +247,14 @@ export default function HomeScreen() {
             >
               <Text style={styles.icon}>🚗</Text>
               <Text style={[styles.cardLabel, { color: themeColors.text }]}>
-                {UI_TEXT.devices.parking}
+                {t('home.parking')}
               </Text>
               <Text style={styles.cardStatus}>Kiểm tra</Text>
             </TouchableOpacity>
           </View>
         </View>
 
-        {/* THÔNG SỐ CẢM BIẾN (GIỮ NGUYÊN GỐC 100%) */}
+        {/* THÔNG SỐ CẢM BIẾN */}
         <View
           style={[
             styles.sectionWrapper,
@@ -292,7 +262,7 @@ export default function HomeScreen() {
           ]}
         >
           <Text style={[styles.sectionTitle, { color: themeColors.text }]}>
-            {UI_TEXT.sectionSensors}
+            {t('home.sensors')}
           </Text>
           <View style={styles.gridContainer}>
             <View
@@ -303,7 +273,7 @@ export default function HomeScreen() {
             >
               <Text style={styles.icon}>🌡️</Text>
               <Text style={[styles.cardLabel, { color: themeColors.text }]}>
-                {UI_TEXT.sensors.temp}
+                {t('home.temp')}
               </Text>
               <Text
                 style={[
@@ -313,8 +283,7 @@ export default function HomeScreen() {
                   },
                 ]}
               >
-                {temperature}
-                {UI_TEXT.sensors.unitTemp}
+                {temperature}{t('home.unitTemp')}
               </Text>
             </View>
             <View
@@ -325,17 +294,16 @@ export default function HomeScreen() {
             >
               <Text style={styles.icon}>💧</Text>
               <Text style={[styles.cardLabel, { color: themeColors.text }]}>
-                {UI_TEXT.sensors.humi}
+                {t('home.humi')}
               </Text>
               <Text style={[styles.cardValue, { color: "#4CAF50" }]}>
-                {humidity}
-                {UI_TEXT.sensors.unitHumi}
+                {humidity}{t('home.unitHumi')}
               </Text>
             </View>
           </View>
         </View>
 
-        {/* THIẾT LẬP HỆ THỐNG (BỔ SUNG KHÓA CHO SLIDER) */}
+        {/* THIẾT LẬP HỆ THỐNG */}
         <View
           style={[
             styles.sectionWrapper,
@@ -356,7 +324,7 @@ export default function HomeScreen() {
                 { color: themeColors.text, marginBottom: 0 },
               ]}
             >
-              {UI_TEXT.sectionPassive}
+              {t('home.settings')}
             </Text>
             <Switch value={isUnlocked} onValueChange={toggleUnlock} />
           </View>
@@ -368,7 +336,7 @@ export default function HomeScreen() {
               <View style={styles.rowLabel}>
                 <MaterialIcons name="thermostat" size={24} color="#764ba2" />
                 <Text style={[styles.settingText, { color: themeColors.text }]}>
-                  {UI_TEXT.thresholds.tempTitle}: {tempThreshold}°C
+                  {t('home.tempTitle')}: {tempThreshold}°C
                 </Text>
               </View>
               <Slider
@@ -378,7 +346,7 @@ export default function HomeScreen() {
                 step={1}
                 value={tempThreshold}
                 onValueChange={setTempThreshold}
-                disabled={!isUnlocked} // KHÓA THANH TRƯỢT KHI KHÔNG UNLOCK
+                disabled={!isUnlocked}
                 minimumTrackTintColor="#764ba2"
                 maximumTrackTintColor="#ccc"
                 thumbTintColor={!isUnlocked ? "#999" : "#764ba2"}
@@ -394,7 +362,7 @@ export default function HomeScreen() {
             >
               <MaterialIcons name="wb-sunny" size={24} color="#FFB300" />
               <Text style={[styles.settingText, { color: themeColors.text }]}>
-                {UI_TEXT.thresholds.timeOnTitle}
+                {t('home.timeOnTitle')}
               </Text>
               <View style={styles.timeValueBox}>
                 <Text style={styles.timeValueText}>{lightOnTime}</Text>
@@ -410,7 +378,7 @@ export default function HomeScreen() {
             >
               <MaterialIcons name="nights-stay" size={24} color="#5C6BC0" />
               <Text style={[styles.settingText, { color: themeColors.text }]}>
-                {UI_TEXT.thresholds.timeOffTitle}
+                {t('home.timeOffTitle')}
               </Text>
               <View style={styles.timeValueBox}>
                 <Text style={styles.timeValueText}>{lightOffTime}</Text>
@@ -448,15 +416,11 @@ export default function HomeScreen() {
               disabled={!isUnlocked}
             >
               <MaterialIcons name="cloud-upload" size={20} color="#fff" />
-              <Text style={styles.saveBtnText}>
-                {" "}
-                {UI_TEXT.thresholds.btnUpdate}
-              </Text>
+              <Text style={styles.saveBtnText}> {t('home.btnUpdate')}</Text>
             </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
-
     </SafeAreaView>
   );
 }
