@@ -61,7 +61,7 @@ const InputField = ({
 
 export default function ChangePasswordScreen() {
     const router = useRouter();
-    const { theme } = useAppSettings();
+    const { theme, t } = useAppSettings();
     const themeColors = Colors[theme];
     const headerColor = theme === 'dark' ? '#3f2e5a' : '#764ba2';
 
@@ -77,22 +77,22 @@ export default function ChangePasswordScreen() {
         const user = auth.currentUser;
 
         if (!currentPassword || !newPassword || !confirmPassword) {
-            Alert.alert('Lỗi', 'Vui lòng nhập đầy đủ thông tin');
+            Alert.alert(t('common.error'), t('changePassword.allFieldsRequired'));
             return;
         }
 
         if (newPassword !== confirmPassword) {
-            Alert.alert('Lỗi', 'Mật khẩu mới và xác nhận mật khẩu không khớp');
+            Alert.alert(t('common.error'), t('changePassword.passwordMismatch'));
             return;
         }
 
         if (newPassword.length < 6) {
-            Alert.alert('Lỗi', 'Mật khẩu mới phải có ít nhất 6 ký tự');
+            Alert.alert(t('common.error'), t('changePassword.passwordTooShort'));
             return;
         }
 
         if (!user || !user.email) {
-            Alert.alert('Lỗi', 'Không tìm thấy thông tin người dùng');
+            Alert.alert(t('common.error'), t('changePassword.userNotFound'));
             return;
         }
 
@@ -103,7 +103,7 @@ export default function ChangePasswordScreen() {
             await reauthenticateWithCredential(user, credential);
             await updatePassword(user, newPassword);
 
-            Alert.alert('Thành công', 'Mật khẩu đã được thay đổi thành công', [
+            Alert.alert(t('common.success'), t('changePassword.success'), [
                 {
                     text: 'OK',
                     onPress: () => {
@@ -113,15 +113,15 @@ export default function ChangePasswordScreen() {
                 },
             ]);
         } catch (error: any) {
-            let errorMessage = 'Không thể thay đổi mật khẩu';
+            let errorMessage = t('changePassword.changeError');
             if (error.code === 'auth/wrong-password') {
-                errorMessage = 'Mật khẩu hiện tại không đúng';
+                errorMessage = t('changePassword.wrongPassword');
             } else if (error.code === 'auth/weak-password') {
-                errorMessage = 'Mật khẩu mới quá yếu';
+                errorMessage = t('changePassword.weakPassword');
             } else if (error.code === 'auth/requires-recent-login') {
-                errorMessage = 'Vui lòng đăng nhập lại để thực hiện thao tác này';
+                errorMessage = t('changePassword.recentLoginRequired');
             }
-            Alert.alert('Lỗi', errorMessage);
+            Alert.alert(t('common.error'), errorMessage);
         } finally {
             setLoading(false);
         }
@@ -135,42 +135,42 @@ export default function ChangePasswordScreen() {
                 <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
                     <MaterialIcons name="arrow-back" size={24} color="#fff" />
                 </TouchableOpacity>
-                <Text style={styles.headerTitle}>Đổi mật khẩu</Text>
+                <Text style={styles.headerTitle}>{t('changePassword.title')}</Text>
                 <View style={{ width: 24 }} />
             </View>
 
             <ScrollView style={styles.scrollArea} contentContainerStyle={styles.scrollContent}>
                 <View style={[styles.card, { backgroundColor: theme === 'dark' ? '#1f1f29' : '#ffffff' }]}>
                     <Text style={[styles.description, { color: themeColors.text }]}>
-                        Nhập mật khẩu hiện tại và mật khẩu mới để thay đổi.
+                        {t('changePassword.description')}
                     </Text>
 
                     <InputField
-                        label="Mật khẩu hiện tại"
+                        label={t('changePassword.currentPassword')}
                         value={form.currentPassword}
                         onChange={(text) => setForm({ ...form, currentPassword: text })}
                         secureTextEntry
-                        placeholder="Nhập mật khẩu hiện tại"
+                        placeholder={t('changePassword.currentPasswordPlaceholder')}
                         theme={theme}
                         themeColors={themeColors}
                     />
 
                     <InputField
-                        label="Mật khẩu mới"
+                        label={t('changePassword.newPassword')}
                         value={form.newPassword}
                         onChange={(text) => setForm({ ...form, newPassword: text })}
                         secureTextEntry
-                        placeholder="Nhập mật khẩu mới"
+                        placeholder={t('changePassword.newPasswordPlaceholder')}
                         theme={theme}
                         themeColors={themeColors}
                     />
 
                     <InputField
-                        label="Xác nhận mật khẩu mới"
+                        label={t('changePassword.confirmPassword')}
                         value={form.confirmPassword}
                         onChange={(text) => setForm({ ...form, confirmPassword: text })}
                         secureTextEntry
-                        placeholder="Nhập lại mật khẩu mới"
+                        placeholder={t('changePassword.confirmPasswordPlaceholder')}
                         theme={theme}
                         themeColors={themeColors}
                     />
@@ -182,7 +182,7 @@ export default function ChangePasswordScreen() {
                         disabled={loading}
                     >
                         <Text style={styles.buttonText}>
-                            {loading ? 'Đang xử lý...' : 'Thay đổi mật khẩu'}
+                            {loading ? t('changePassword.processing') : t('changePassword.button')}
                         </Text>
                     </TouchableOpacity>
                 </View>
