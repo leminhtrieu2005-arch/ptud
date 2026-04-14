@@ -1,4 +1,4 @@
-﻿import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { onValue, ref } from 'firebase/database';
 import React, { useContext, useEffect, useState } from 'react';
@@ -17,17 +17,24 @@ export default function GraphScreen() {
   const { unread } = useContext(NotiContext);
 
   // State cho biến đếm trong 15 giây
-  const [countS1, setCountS1] = useState(0);
-  const [countS2, setCountS2] = useState(0);
+  const [countIn, setCountIn] = useState(0);    // Số xe vào (rising edge)
+  const [countOut, setCountOut] = useState(0);  // Số xe ra (falling edge)
 
   // Lịch sử đếm qua các khoảng 15 giây (7 mẫu)
-  const [countHistoryS1, setCountHistoryS1] = useState<number[]>(new Array(7).fill(0));
-  const [countHistoryS2, setCountHistoryS2] = useState<number[]>(new Array(7).fill(0));
+  const [countHistoryIn, setCountHistoryIn] = useState<number[]>(new Array(7).fill(0));
+  const [countHistoryOut, setCountHistoryOut] = useState<number[]>(new Array(7).fill(0));
   const [labels, setLabels] = useState<string[]>(new Array(7).fill(''));
 
   // State để theo dõi giá trị trước đó của sensor
-  const [prevS1, setPrevS1] = useState(0);
-  const [prevS2, setPrevS2] = useState(0);
+  const [prevS1, setPrevS1] = useState<number | null>(null);
+  const [prevS2, setPrevS2] = useState<number | null>(null);
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // Reset biến đếm khi component mount
+  useEffect(() => {
+    setCountIn(0);
+    setCountOut(0);
+  }, []);
 
   useEffect(() => {
     const sensorRef = ref(db, 'thuan2/sensor');
@@ -39,12 +46,23 @@ export default function GraphScreen() {
         const s1 = Number(data.sensorStatus1) || 0;
         const s2 = Number(data.sensorStatus2) || 0;
 
-        // Đếm khi sensor chuyển từ 0 lên 1 (edge detection)
-        if (s1 === 1 && prevS1 === 0) {
-          setCountS1(prev => prev + 1);
+        // Lần đầu tiên: khởi tạo giá trị cảm biến mà không đếm
+        if (!isInitialized) {
+          setPrevS1(s1);
+          setPrevS2(s2);
+          setIsInitialized(true);
+          return;
         }
-        if (s2 === 1 && prevS2 === 0) {
-          setCountS2(prev => prev + 1);
+
+        // Lần sau: đếm khi có sự thay đổi (edge detection)
+        // Đếm số xe vào khi sensor chuyển từ 0 lên 1 (rising edge)
+        if ((s1 === 1 && prevS1 === 0) || (s2 === 1 && prevS2 === 0)) {
+          setCountIn(prev => prev + 1);
+        }
+        
+        // Đếm số xe ra khi sensor chuyển từ 1 xuống 0 (falling edge)
+        if ((s1 === 0 && prevS1 === 1) || (s2 === 0 && prevS2 === 1)) {
+          setCountOut(prev => prev + 1);
         }
 
         setPrevS1(s1);
@@ -53,7 +71,7 @@ export default function GraphScreen() {
     });
 
     return () => unsubscribe();
-  }, [prevS1, prevS2]);
+  }, [isInitialized, prevS1, prevS2]);
 
   // Reset đếm và cập nhật lịch sử mỗi 15 giây
   useEffect(() => {
@@ -66,37 +84,37 @@ export default function GraphScreen() {
       });
 
       // Cập nhật lịch sử
-      setCountHistoryS1(prev => [...prev.slice(1), countS1]);
-      setCountHistoryS2(prev => [...prev.slice(1), countS2]);
+      setCountHistoryIn(prev => [...prev.slice(1), countIn]);
+      setCountHistoryOut(prev => [...prev.slice(1), countOut]);
       setLabels(prev => [...prev.slice(1), timeStr]);
 
       // Reset đếm
-      setCountS1(0);
-      setCountS2(0);
+      setCountIn(0);
+      setCountOut(0);
     }, 15000); // 15 giây
 
     return () => clearInterval(interval);
-  }, [countS1, countS2]);
+  }, [countIn, countOut]);
 
   const chartData = {
     labels: labels,
     datasets: [
       {
-        data: countHistoryS1,
+        data: countHistoryIn,
         color: (opacity = 1) => `rgba(255, 69, 58, ${opacity})`, 
         strokeWidth: 3,
       },
       {
-        data: countHistoryS2,
+        data: countHistoryOut,
         color: (opacity = 1) => `rgba(10, 132, 255, ${opacity})`, 
         strokeWidth: 3,
       },
     ],
-    legend: ["CB1 (Đếm 15s)", "CB2 (Đếm 15s)"] 
+    legend: ["Số xe vào (15s)", "Số xe ra (15s)"] 
   };
 
   // Tính toán max value để điều chỉnh trục Y
-  const maxValue = Math.max(...countHistoryS1, ...countHistoryS2, 0);
+  const maxValue = Math.max(...countHistoryIn, ...countHistoryOut, 0);
   const yAxisMax = maxValue < 10 ? 10 : 20;
   const yAxisSegments = maxValue < 10 ? 5 : 10; // 5 segments cho 0-10, 10 segments cho 0-20
 
@@ -122,7 +140,7 @@ export default function GraphScreen() {
       <ScrollView contentContainerStyle={styles.content}>
         <View style={[styles.chartContainer, { backgroundColor: theme === 'dark' ? '#1c1c1e' : '#fff' }]}>
           <Text style={[styles.chartTitle, { color: themeColors.text }]}>
-            Số lần phát hiện vật cản trong 15 giây
+            Biểu đồ số xe vào/ra (15 giây/lần)
           </Text>
           
           <LineChart
@@ -157,11 +175,11 @@ export default function GraphScreen() {
         <View style={[styles.infoCard, { backgroundColor: theme === 'dark' ? '#1c1c1e' : '#fff' }]}>
            <View style={styles.infoRow}>
              <MaterialIcons name="lens" size={12} color="rgba(255, 69, 58, 1)" />
-             <Text style={[styles.infoText, {color: themeColors.text}]}> CB1 hiện tại: {countS1} lần</Text>
+             <Text style={[styles.infoText, {color: themeColors.text}]}> Số xe vào (hiện tại): {countIn} lần</Text>
            </View>
            <View style={styles.infoRow}>
              <MaterialIcons name="lens" size={12} color="rgba(10, 132, 255, 1)" />
-             <Text style={[styles.infoText, {color: themeColors.text}]}> CB2 hiện tại: {countS2} lần</Text>
+             <Text style={[styles.infoText, {color: themeColors.text}]}> Số xe ra (hiện tại): {countOut} lần</Text>
            </View>
         </View>
       </ScrollView>
