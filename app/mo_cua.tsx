@@ -101,6 +101,47 @@ export default function MoCuaScreen() {
     </View>
   );
 
+  // Component giao di?n cho các c?a r?ng (3,4,5,6)
+  const EmptyDoor = ({ label }: { label: string }) => (
+    <View style={styles(theme).content}>
+      <Text style={styles(theme).subTitle}>{label}</Text>
+
+      <View
+        style={[
+          styles(theme).statusBox,
+          styles(theme).statusEmpty,
+        ]}
+      >
+        <MaterialIcons
+          name="door-sliding"
+          size={60}
+          color="#999"
+        />
+        <Text
+          style={[styles(theme).statusText, { color: "#666" }]}
+        >
+          {t('door.notConnected')}
+        </Text>
+      </View>
+
+      <View style={styles(theme).buttonWrapper}>
+        <TouchableOpacity
+          style={[styles(theme).btn, styles(theme).btnDisabled]}
+          disabled={true}
+        >
+          <Text style={styles(theme).btnText}>{t('door.openBtn')}</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles(theme).btn, styles(theme).btnDisabled]}
+          disabled={true}
+        >
+          <Text style={styles(theme).btnText}>{t('door.closeBtn')}</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+
   return (
     <SafeAreaView style={styles(theme).container}>
       {/* Nút Quay lại */}
@@ -127,6 +168,26 @@ export default function MoCuaScreen() {
           apiKey="button2"
           status={deviceStates.serverOn2}
         />
+
+        <View style={styles(theme).divider} />
+
+        {/* Cửa 3 - Rỗng */}
+        <EmptyDoor label={t('door.door3')} />
+
+        <View style={styles(theme).divider} />
+
+        {/* Cửa 4 - Rỗng */}
+        <EmptyDoor label={t('door.door4')} />
+
+        <View style={styles(theme).divider} />
+
+        {/* Cửa 5 - Rỗng */}
+        <EmptyDoor label={t('door.door5')} />
+
+        <View style={styles(theme).divider} />
+
+        {/* Cửa 6 - Rỗng */}
+        <EmptyDoor label={t('door.door6')} />
       </ScrollView>
     </SafeAreaView>
   );
@@ -162,6 +223,7 @@ const styles = (theme: 'light' | 'dark') => StyleSheet.create({
   },
   statusOpen: { borderLeftWidth: 5, borderLeftColor: "#4CAF50" },
   statusClosed: { borderLeftWidth: 5, borderLeftColor: "#F44336" },
+  statusEmpty: { borderLeftWidth: 5, borderLeftColor: "#999" },
   statusText: { marginTop: 10, fontSize: 16, fontWeight: "bold" },
   buttonWrapper: { flexDirection: "row", width: "100%", gap: 15 },
   btn: {
