@@ -145,14 +145,19 @@ export default function MoCuaScreen() {
   return (
     <SafeAreaView style={styles(theme).container}>
       {/* Nút Quay lại */}
-      <TouchableOpacity onPress={() => router.back()} style={styles(theme).backButton}>
-        <MaterialIcons name="arrow-back" size={24} color={themeColors.text} />
-        <Text style={styles(theme).backText}>{t('door.back')}</Text>
-      </TouchableOpacity>
+      <View
+        style={[
+          styles(theme).header,
+          { backgroundColor: theme === "dark" ? "#1f1f29" : "#ffffff" },
+        ]}
+      >
+        <TouchableOpacity onPress={() => router.back()} style={styles(theme).backButton}>
+          <MaterialIcons name="arrow-back-ios" size={20} color={themeColors.text} />
+        </TouchableOpacity>
+        <Text style={styles(theme).title}>{t('door.title')}</Text>
+      </View>
 
       <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
-        <Text style={styles(theme).title}>{t('door.title')}</Text>
-
         {/* Điều khiển Cửa 1 - Sử dụng button2 */}
         <DoorControl
           label={t('door.door1')}
@@ -195,6 +200,14 @@ export default function MoCuaScreen() {
 
 const styles = (theme: 'light' | 'dark') => StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors[theme].background },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    elevation: 2,
+  },
   backButton: { flexDirection: "row", padding: 20, alignItems: "center" },
   backText: { fontSize: 16, fontWeight: "600", color: Colors[theme].text },
   content: { alignItems: "center", paddingHorizontal: 30, marginBottom: 10 },
@@ -202,8 +215,10 @@ const styles = (theme: 'light' | 'dark') => StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     color: Colors[theme].text,
-    textAlign: "center",
-    marginBottom: 20,
+    textAlign: "left",
+    marginBottom: 2,
+    flex: 1,  
+    marginLeft: 15,
   },
   subTitle: {
     fontSize: 16,
