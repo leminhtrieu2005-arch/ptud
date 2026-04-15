@@ -103,7 +103,7 @@ export default function SlotScreen() {
         <Text style={[styles.headerTitle, { color: themeColors.text }]}>
           {t("slot.title")}
         </Text>
-        <View style={{ width: 40 }} />
+        <View style={{ width: 40}} />
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
@@ -145,7 +145,7 @@ export default function SlotScreen() {
         </View>
 
         <Text style={[styles.sectionTitle, { color: themeColors.text }]}>
-          {t("slot.title")}
+          {t("slot.title1")}
         </Text>
 
         {/* Grid Slots */}
@@ -215,7 +215,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   backButton: { padding: 10 },
-  headerTitle: { fontSize: 18, fontWeight: "bold" },
+  headerTitle: { fontSize: 24, fontWeight: "bold" },
   content: { flex: 1, padding: 15 },
   summaryContainer: {
     flexDirection: "row",
