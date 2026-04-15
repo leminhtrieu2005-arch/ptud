@@ -80,7 +80,7 @@ export default function GraphScreen() {
       const timeStr = now.toLocaleTimeString('vi-VN', { 
         hour: '2-digit', 
         minute: '2-digit', 
-        second: '2-digit' 
+        //second: '2-digit' 
       });
 
       // Cập nhật lịch sử
@@ -91,7 +91,7 @@ export default function GraphScreen() {
       // Reset đếm
       setCountIn(0);
       setCountOut(0);
-    }, 15000); // 15 giây
+    }, 10000); // 15 giây
 
     return () => clearInterval(interval);
   }, [countIn, countOut]);
@@ -110,7 +110,7 @@ export default function GraphScreen() {
         strokeWidth: 3,
       },
     ],
-    legend: ["Số xe vào (15s)", "Số xe ra (15s)"] 
+    legend: [t('graph.legendIn'), t('graph.legendOut')] 
   };
 
   // Tính toán max value để điều chỉnh trục Y
@@ -133,14 +133,14 @@ export default function GraphScreen() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: themeColors.background }]}>
       {/* Header */}
-      <View style={[styles.header, { backgroundColor: theme === 'dark' ? '#2c2c2e' : '#4A90E2' }]}> 
-        <Text style={styles.headerTitle}>{t('graph.title') || 'Biểu đồ cảm biến'}</Text>
+      <View style={[styles.header, { backgroundColor: theme === 'dark' ? '#3f2e5a' : '#764ba2' }]}> 
+        <Text style={styles.headerTitle}>{t('home.graph')}</Text>
       </View>
 
       <ScrollView contentContainerStyle={styles.content}>
         <View style={[styles.chartContainer, { backgroundColor: theme === 'dark' ? '#1c1c1e' : '#fff' }]}>
           <Text style={[styles.chartTitle, { color: themeColors.text }]}>
-            Biểu đồ số xe vào/ra (15 giây/lần)
+            {t('graph.chartTitle')}
           </Text>
           
           <LineChart
@@ -175,11 +175,11 @@ export default function GraphScreen() {
         <View style={[styles.infoCard, { backgroundColor: theme === 'dark' ? '#1c1c1e' : '#fff' }]}>
            <View style={styles.infoRow}>
              <MaterialIcons name="lens" size={12} color="rgba(255, 69, 58, 1)" />
-             <Text style={[styles.infoText, {color: themeColors.text}]}> Số xe vào (hiện tại): {countIn} lần</Text>
+             <Text style={[styles.infoText, {color: themeColors.text}]}> {t('graph.carsIn')} {countIn}</Text>
            </View>
            <View style={styles.infoRow}>
              <MaterialIcons name="lens" size={12} color="rgba(10, 132, 255, 1)" />
-             <Text style={[styles.infoText, {color: themeColors.text}]}> Số xe ra (hiện tại): {countOut} lần</Text>
+             <Text style={[styles.infoText, {color: themeColors.text}]}> {t('graph.carsOut')} {countOut}</Text>
            </View>
         </View>
       </ScrollView>
@@ -190,8 +190,8 @@ export default function GraphScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  header: { padding: 20, borderBottomLeftRadius: 20, borderBottomRightRadius: 20, paddingTop: 50 },
-  headerTitle: { color: '#fff', fontSize: 18, fontWeight: 'bold', textAlign: 'center' },
+  header: { paddingVertical: 20, alignItems: 'center', borderBottomLeftRadius: 20, borderBottomRightRadius: 20, marginBottom: 20 },
+  headerTitle: { color: '#fff', fontSize: 22, fontWeight: 'bold', textAlign: 'center' },
   content: { padding: 15, paddingBottom: 120 },
   chartContainer: { 
     padding: 15, 
