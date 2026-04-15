@@ -36,7 +36,7 @@ export default function IntroScreen() {
           duration={1500}
           iterationCount={1}
           easing="linear"
-          source={{ uri: 'https://cdn-icons-png.flaticon.com/128/15167/15167409.png' }}
+          source={{ uri: 'https://cdn-icons-png.flaticon.com/128/7615/7615749.png' }}
           style={styles.carLogo}
         />
       </LinearGradient>
